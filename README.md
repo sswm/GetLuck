@@ -15,3 +15,16 @@ in order to get luck lumber here
 #really bad luck
 #if you want to to bet and sure to win, you should make sure you have 256 yuan.
 
+#Concultion:
+#1. 50%win  is good for bet,and when you fail you shall add you point to bet,other wize you will fail
+
+#2. the fatal factor to win is that,when you fail you shall double your det point.
+#3. if you got enough money is ok to below 50% win(continue lose may be bigger than 10 times it means 1024)
+#other wize you shall bet 60% to win to decrease continue lose(may be smaller than 10 times).
+#4. try more than 10millon times will not specially increace continue fail times.
+
+
+#1.double you bet when you fail
+#2.make sure you have more than 50% to win.
+#3.have the worst plan when you fail.maybe continue 15 or 18 times fail(always 10,11,12)
+

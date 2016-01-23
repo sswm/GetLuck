@@ -6,11 +6,28 @@
 #include<time.h>
 
 
+#define	TEST_TIMES 100000
+
+
+//#define	__DEBUG
+
+#ifdef __DEBUG
+#define	SelfPrintf(fmt, args...) printf(fmt, ##args)
+#else
+#define	SelfPrintf(fmt, ...)
+#endif
+
+#define DEBUG_INFO(fmt, args...) printf("\033[33m[%s:%d]\033[0m "#fmt"\r\n", __func__, __LINE__, ##args);
+
+
+
 #define INPUT_MIN_NUM		0
 #define	INPUT_MAX_NUM		9
+#define	COMMON_SAME_TIMES   5
 
+//the percentage to win
+#define	ALWAYS_TEST_PERCENTAGE	60
 
-#define	ALWAYS_TEST_PERCENTAGE	50
 #define	NEED_INPUT_NUMBER	ALWAYS_TEST_PERCENTAGE * (INPUT_MAX_NUM - INPUT_MIN_NUM + 1)/100
 
 #define	BUF_SIZE		1024
@@ -25,7 +42,28 @@ int nowPoint = 0;
 
 int betPoint = 0;
 
-int number_array[NEED_INPUT_NUMBER];
+int nowState = 1;// init win first time
+
+
+int max_win_times = 0;
+int max_lose_times = 0;
+
+int number_array[NEED_INPUT_NUMBER] = {
+	#if (ALWAYS_TEST_PERCENTAGE == 50)
+	1,2,3,4,5
+	#endif
+	#if (ALWAYS_TEST_PERCENTAGE == 40)
+	1,2,4,5
+	#endif
+	#if (ALWAYS_TEST_PERCENTAGE == 60)
+	0,1,2,3,4,5
+	#endif
+};
+
+
+
+
+
 
 int SaveYourPoint(int totalPoint);
 
@@ -50,14 +88,70 @@ void ShowUsage(void) {
 }
 
 void InputYourBetPoint(void) {
-	printf("Please input your bet point\n");
-	scanf("%d", &betPoint);
-	printf("Your bet point is %d\n", betPoint);
+	static int continueWinTimes = 0;
+	static int continueFailTimes = 0;
+	//int i = 0;
+	
+	SelfPrintf("Please input your bet point\n");
+	if (nowState == 0) {
+		betPoint *= 2;
+		//betPoint++;//you must add your point if you want to win
+		//betPoint = 4;
+		//betPoint = 2;//alway fail negative point
+		//betPoint = 1;
+		continueFailTimes++;
+/*
+		while(continueFailTimes) {
+			continueFailTimes >>= 1;
+			if (continueFailTimes) {
+				i++;
+			}
+		}
+*/	
+		continueWinTimes = 0;
+
+		SelfPrintf("Your bet point is %d continue fail %d times\n", betPoint, continueFailTimes);
+		if (continueFailTimes >= COMMON_SAME_TIMES) {
+			if (continueFailTimes >= max_lose_times) {
+				max_lose_times = continueFailTimes;
+			}
+			printf("Your bet point is %d continue fail %d times\n", betPoint, continueFailTimes);
+			//sleep(2);
+			//printf("Continue lose~~\n");
+			//sleep(4);
+		}
+	} else {
+		betPoint = 1;
+		continueWinTimes++;
+		continueFailTimes = 0;
+		//extra add bet and get more point here
+		if(continueWinTimes >= 2) {
+			//betPoint = 2;	
+			//betPoint++;
+			//betPoint *= 3;// equal to betPoint += 3
+			//betPoint += 3;
+		}
+		
+		
+		
+		SelfPrintf("Your bet point is %d continue win %d times\n", betPoint, continueWinTimes);
+		if (continueWinTimes >= COMMON_SAME_TIMES) {
+			if (continueWinTimes >= max_win_times) {
+				max_win_times = continueWinTimes;
+			}
+			printf("Your bet point is %d continue win %d times\n", betPoint, continueWinTimes);
+			//sleep(2);
+			//printf("continue win~~\n");
+			//sleep(4);
+		}
+	}
+	//scanf("%d", &betPoint);
+	
 }
 
 void InputWhatYouWant(void) {
 	int i;
-	printf("Please input you %d numbers\n", NEED_INPUT_NUMBER);
+	SelfPrintf("Please input your %d numbers\n", NEED_INPUT_NUMBER);
 
 	//int inputTimes = NEED_INPUT_NUMBER;
 #if 0
@@ -65,28 +159,29 @@ void InputWhatYouWant(void) {
 		scanf("%d", &number_array[i]);
 	}
 #else	
-	scanf("%d,%d,%d,%d,%d", &number_array[0], &number_array[1], &number_array[2], &number_array[3], &number_array[4]);
-	SafeFlush(stdin);
+	//scanf("%d,%d,%d,%d,%d", &number_array[0], &number_array[1], &number_array[2], &number_array[3], &number_array[4]);
+	//SafeFlush(stdin);
 
 #endif
-	printf("Your input number:");
+	SelfPrintf("Your input number:");
 	for(i = 0; i < NEED_INPUT_NUMBER; i++){
-		printf("%d", number_array[i]);
+		SelfPrintf("%d", number_array[i]);
 		if (i != NEED_INPUT_NUMBER - 1) {
-			printf(",");
+			SelfPrintf(",");
 		}
 	}
-	printf("\n");
+	SelfPrintf("\n");
 }
 
 void GetLuckNumber(void) {
-	
-	srand(time(0));
+
+	srand(clock());
+	//srand(time(0));
 
 	luckNum = rand() % 10;
 
-	SaveYourPoint(luckNum);
-	printf("The Luck number is %d\n",luckNum);
+	//SaveYourPoint(luckNum);
+	SelfPrintf("The Luck number is %d\n",luckNum);
 
 
 }
@@ -106,7 +201,7 @@ void InitData(void) {
 
 
 int SaveYourPoint(int totalPoint) {
-
+	static int i = 0;
 #if 0
 	
 	int fd;
@@ -130,7 +225,12 @@ int SaveYourPoint(int totalPoint) {
 	close(fd);	
 #else
 	char buf[BUF_SIZE];
-	sprintf(buf, "echo 'Your total point is %d' >> %s.txt", totalPoint, name_file);
+	if (i == 0) {
+		i = 1;
+		sprintf(buf, "echo 'Your total point is %4d bet is %4d'> %s.txt", totalPoint, betPoint, name_file);
+	} else {
+		sprintf(buf, "echo 'Your total point is %4d bet is %4d'>> %s.txt", totalPoint, betPoint, name_file);
+	}
 	system(buf);
 #endif
 	
@@ -140,31 +240,38 @@ int SaveYourPoint(int totalPoint) {
 
 void CalYourPoint(void) {
 	int i;
+
+	nowState = 1;
 	totalTimes++;
 	for (i = 0; i < NEED_INPUT_NUMBER; i++) {
 		if (number_array[i] == luckNum) {
 			nowPoint += betPoint;
-			printf("Good Luck! try times:%d\ntotal point:%d\n", totalTimes, nowPoint);	
+			SelfPrintf("Good Luck! try times:%d\ntotal point:%d\n", totalTimes, nowPoint);	
 			return;
 		}
 	}
 	nowPoint -= betPoint;
-	printf("Poor guy! not win! try times:%d\ntotal point:%d\n", totalTimes, nowPoint);
+	nowState = 0;
+	SelfPrintf("Poor guy! not win! try times:%d\ntotal point:%d\n", totalTimes, nowPoint);
 }
 
 int main(void) {
-
+	int testTimes = TEST_TIMES;
 	ShowUsage();
 	//InitData();
 	//SaveYourPoint(100);
 
-	while(1) {
+	while(testTimes--) {
 		InputYourBetPoint();
 		InputWhatYouWant();
 
 		GetLuckNumber();
 
 		CalYourPoint();
+		//SaveYourPoint(nowPoint);
+		usleep(10);
 	}	
+	printf("\nYour total point is %d\n", nowPoint);
+	printf("\nmax win times:%d  max lose times:%d\n", max_win_times, max_lose_times);
 	return 0;
 }
