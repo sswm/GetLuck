@@ -6,7 +6,7 @@
 #include<time.h>
 
 
-#define	TEST_TIMES 100000
+#define	TEST_TIMES 10000
 
 
 //#define	__DEBUG
@@ -26,7 +26,7 @@
 #define	COMMON_SAME_TIMES   5
 
 //the percentage to win
-#define	ALWAYS_TEST_PERCENTAGE	60
+#define	ALWAYS_TEST_PERCENTAGE	70
 
 #define	NEED_INPUT_NUMBER	ALWAYS_TEST_PERCENTAGE * (INPUT_MAX_NUM - INPUT_MIN_NUM + 1)/100
 
@@ -57,6 +57,9 @@ int number_array[NEED_INPUT_NUMBER] = {
 	#endif
 	#if (ALWAYS_TEST_PERCENTAGE == 60)
 	0,1,2,3,4,5
+	#endif
+	#if (ALWAYS_TEST_PERCENTAGE == 70)
+	0,1,2,3,4,5,6
 	#endif
 };
 
@@ -273,5 +276,6 @@ int main(void) {
 	}	
 	printf("\nYour total point is %d\n", nowPoint);
 	printf("\nmax win times:%d  max lose times:%d\n", max_win_times, max_lose_times);
+	printf("you shall get at lease 2e%d yuan\n", max_lose_times);
 	return 0;
 }
