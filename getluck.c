@@ -19,7 +19,7 @@
 
 #define DEBUG_INFO(fmt, args...) printf("\033[33m[%s:%d]\033[0m "#fmt"\r\n", __func__, __LINE__, ##args);
 
-#define	NOW_DISCOUNT		100 //75
+#define	NOW_DISCOUNT		90 //75
 #define	DISCOUNT			(float)NOW_DISCOUNT/(float)100
 #define	EVERY_BET_POINT			10
 
@@ -32,7 +32,7 @@
 #define	COMMON_SAME_TIMES   2
 
 //the percentage to win
-#define	ALWAYS_TEST_PERCENTAGE	70
+#define	ALWAYS_TEST_PERCENTAGE	50
 
 #define	WIN_POINT		((float)ALWAYS_TEST_PERCENTAGE/100)
 
@@ -57,11 +57,17 @@ int max_win_times = 0;
 int max_lose_times = 0;
 
 int number_array[NEED_INPUT_NUMBER] = {
-	#if (ALWAYS_TEST_PERCENTAGE == 50)
-	1,2,3,4,5
+	#if (ALWAYS_TEST_PERCENTAGE == 20)
+	1,2
+	#endif	
+	#if (ALWAYS_TEST_PERCENTAGE == 30)
+	1,2,3
 	#endif
 	#if (ALWAYS_TEST_PERCENTAGE == 40)
 	1,2,4,5
+	#endif
+	#if (ALWAYS_TEST_PERCENTAGE == 50)
+	1,2,3,4,5
 	#endif
 	#if (ALWAYS_TEST_PERCENTAGE == 60)
 	0,1,2,3,4,5
@@ -116,6 +122,7 @@ void InputYourBetPoint(void) {
 		}
 		#else
 			betPoint *= 2;
+			//betPoint *=2;
 		#endif
 		//betPoint++;//you must add your point if you want to win
 		//betPoint = 4;
@@ -187,6 +194,13 @@ void InputWhatYouWant(void) {
 #else	
 	//scanf("%d,%d,%d,%d,%d", &number_array[0], &number_array[1], &number_array[2], &number_array[3], &number_array[4]);
 	//SafeFlush(stdin);
+	#if 0
+	for(i = 0; i < NEED_INPUT_NUMBER; i++) {
+		if (number_array[i] == luckNum) {
+			number_array[i] = (number_array[i] + (rand() % 10))%9;	
+		}
+	}
+	#endif
 
 #endif
 	SelfPrintf("Your input number:");
@@ -276,7 +290,7 @@ void CalYourPoint(void) {
 			product_value = betPoint/WIN_POINT;
 			win_bet_point = product_value*DISCOUNT - betPoint;
 			nowPoint += win_bet_point;
-			printf("product_value:%f, win_bet_point:%f", product_value, win_bet_point);
+			printf("product_value:%f, win_bet_point:%f\n", product_value, win_bet_point);
 			//nowPoint += (betPoint*DISCOUNT);
 			SelfPrintf("Good Luck! try times:%d\ntotal point:%f\n", totalTimes, nowPoint);	
 			return;
@@ -302,6 +316,7 @@ int main(void) {
 		CalYourPoint();
 		//SaveYourPoint(nowPoint);
 		usleep(10);
+		//sleep(1);
 	}	
 	printf("\nYour total point is %f\n", nowPoint);
 	printf("%d%s win, every bet point:%d, win:%0.1f discount, testing %d times\n", ALWAYS_TEST_PERCENTAGE, "%", EVERY_BET_POINT, (float)EVERY_BET_POINT*DISCOUNT, TEST_TIMES);
