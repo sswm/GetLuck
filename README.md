@@ -28,3 +28,12 @@ in order to get luck lumber here
 #2.make sure you have more than 50% to win.
 #3.have the worst plan when you fail.maybe continue 15 or 18 times fail(always 10,11,12)
 
+
+
+I modify the code,because it was not fair.
+now it is fair.
+if you put 60%,you only win 40% value.
+so double you bet may not surely win,maybe 3 times of bet or more.
+alse,the point you win may discount.
+50% and enough point is ok to win.
+
